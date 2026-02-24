@@ -1,7 +1,7 @@
 import type { Page } from '../types/database';
 import {
   LayoutDashboard, BookOpen, Calendar, Timer, Brain,
-  FileText, BarChart3, Heart, LogOut, X, GraduationCap
+  FileText, BarChart3, LogOut, X, GraduationCap
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -20,7 +20,6 @@ const navItems: { page: Page; label: string; icon: typeof LayoutDashboard }[] = 
   { page: 'flashcards', label: 'Flashcards', icon: Brain },
   { page: 'anotacoes', label: 'Anotações', icon: FileText },
   { page: 'progresso', label: 'Progresso', icon: BarChart3 },
-  { page: 'motivacional', label: 'Motivação', icon: Heart },
 ];
 
 export function Sidebar({ currentPage, navigateTo, onLogout, userName, onClose }: SidebarProps) {
@@ -32,7 +31,7 @@ export function Sidebar({ currentPage, navigateTo, onLogout, userName, onClose }
             <GraduationCap className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">StudyFlow</h1>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Estudos do Meu Amor</h1>
             <p className="text-xs text-gray-400 truncate">Organize seus estudos</p>
           </div>
         </div>

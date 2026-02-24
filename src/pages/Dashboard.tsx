@@ -63,6 +63,8 @@ export function Dashboard({ userId, userName, navigateTo }: DashboardProps) {
         </div>
       </div>
 
+
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 animate-slideUp anim-delay-1">
         <div className="glass-card p-4 md:p-5 card-hover">
           <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mb-3">

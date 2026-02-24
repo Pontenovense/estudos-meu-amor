@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import type { Materia } from '../types/database';
 import { useMaterias } from '../hooks/useMaterias';
 import { useFlashcards } from '../hooks/useFlashcards';
@@ -65,9 +66,10 @@ export function MateriasPage({ userId }: MateriasPageProps) {
         </button>
       </div>
 
-      {showForm && (
+      {showForm && createPortal(
         <div className="modal-overlay" onClick={resetForm}>
-          <div className="modal-content glass-card" onClick={e => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-glass-card max-w-lg w-full">
             <div className="modal-handle" />
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-800">{editingId ? 'Editar Matéria' : 'Nova Matéria'}</h2>
@@ -99,8 +101,10 @@ export function MateriasPage({ userId }: MateriasPageProps) {
                 <button type="submit" className="btn-primary flex-1">{editingId ? 'Salvar Alterações' : 'Criar Matéria'}</button>
               </div>
             </form>
+            </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {materias.length === 0 ? (

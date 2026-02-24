@@ -13,7 +13,8 @@ export function PomodoroPage({ userId }: PomodoroPageProps) {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [state, setState] = useState<TimerState>('idle');
   const [mode, setMode] = useState<TimerMode>('foco');
-  const [completedSessions, setCompletedSessions] = useState(0);
+  const [currentCompleted, setCurrentCompleted] = useState(0);
+
   const [showSettings, setShowSettings] = useState(false);
   const [selectedMateria, setSelectedMateria] = useState('');
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -33,11 +34,13 @@ export function PomodoroPage({ userId }: PomodoroPageProps) {
   const completeSession = useCallback(() => {
     if (mode === 'foco') {
       salvarSessao(focoDuration, selectedMateria || undefined);
-      setCompletedSessions(c => c + 1);
+      setCurrentCompleted(c => c + 1);
+      alert('Sessão de foco concluída! Hora da pausa.');
       setMode('pausa');
       setTimeLeft(pausaDuration * 60);
       setState('idle');
     } else {
+      alert('Pausa concluída! Pronto para focar novamente.');
       setMode('foco');
       setTimeLeft(focoDuration * 60);
       setState('idle');
@@ -128,19 +131,19 @@ export function PomodoroPage({ userId }: PomodoroPageProps) {
             </button>
           )}
           <div className="p-3 rounded-xl bg-gray-100 text-gray-600 min-w-[48px] text-center" title="Sessões concluídas">
-            <span className="text-sm font-bold">{completedSessions}</span>
+            <span className="text-sm font-bold">{currentCompleted}</span>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:gap-4">
         <div className="glass-card p-4 md:p-5 text-center">
-          <p className="text-2xl md:text-3xl font-bold text-purple-600">{todaySessions.length + completedSessions}</p>
+          <p className="text-2xl md:text-3xl font-bold text-purple-600">{todaySessions.length + currentCompleted}</p>
           <p className="text-xs md:text-sm text-gray-500 mt-1">Sessões hoje</p>
         </div>
         <div className="glass-card p-4 md:p-5 text-center">
           <p className="text-2xl md:text-3xl font-bold text-purple-600">
-            {((todaySessions.reduce((s, x) => s + x.duracao, 0) + completedSessions * focoDuration) / 60).toFixed(1)}h
+            {((todaySessions.reduce((s, x) => s + x.duracao, 0) + currentCompleted * focoDuration) / 60).toFixed(1)}h
           </p>
           <p className="text-xs md:text-sm text-gray-500 mt-1">Horas focadas</p>
         </div>

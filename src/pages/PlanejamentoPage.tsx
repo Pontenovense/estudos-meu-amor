@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { usePlanejamentos } from '../hooks/usePlanejamentos';
 import { useMaterias } from '../hooks/useMaterias';
 import { Calendar, Plus, Check, X, Trash2, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
@@ -131,9 +132,10 @@ export function PlanejamentoPage({ userId }: PlanejamentoPageProps) {
         })}
       </div>
 
-      {showForm && (
+      {showForm && createPortal(
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="modal-content glass-card" onClick={e => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-glass-card max-w-lg w-full">
             <div className="modal-handle" />
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -179,8 +181,10 @@ export function PlanejamentoPage({ userId }: PlanejamentoPageProps) {
                 <button type="submit" className="btn-primary flex-1" disabled={materias.length === 0}>Criar Bloco</button>
               </div>
             </form>
+            </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

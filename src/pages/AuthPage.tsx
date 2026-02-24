@@ -54,7 +54,7 @@ export function AuthPage() {
             <GraduationCap className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
-            StudyFlow
+            Estudos Meu Amor
           </h1>
           <p className="text-gray-500 mt-2 flex items-center justify-center gap-1.5 text-sm">
             <Sparkles className="w-4 h-4 text-purple-400" />
@@ -65,7 +65,7 @@ export function AuthPage() {
 
         <div className="glass-card p-6 md:p-8 animate-slideUp">
           <h2 className="text-xl font-bold text-gray-800 mb-6">
-            {mode === 'login' && '👋 Bem-vindo(a) de volta!'}
+            {mode === 'login' && '👋 Bem-vinda de volta nenem!'}
             {mode === 'register' && '✨ Crie sua conta'}
             {mode === 'recovery' && '🔐 Recuperar senha'}
           </h2>
@@ -137,7 +137,7 @@ export function AuthPage() {
             )}
           </div>
         </div>
-        <p className="text-center text-xs text-gray-400 mt-6">Feito com 💜 para estudantes dedicados</p>
+        <p className="text-center text-xs text-gray-400 mt-6">Feito com 💜 para a Isabella</p>
       </div>
     </div>
   );

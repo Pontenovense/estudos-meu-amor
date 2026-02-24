@@ -9,7 +9,6 @@ import { PomodoroPage } from './pages/PomodoroPage';
 import { FlashcardsPage } from './pages/FlashcardsPage';
 import { AnotacoesPage } from './pages/AnotacoesPage';
 import { ProgressoPage } from './pages/ProgressoPage';
-import { MotivacionalPage } from './pages/MotivacionalPage';
 import { Sidebar } from './components/Sidebar';
 import { MobileNav } from './components/MobileNav';
 import { isSupabaseConfigured } from './lib/supabase';
@@ -89,7 +88,6 @@ export function App() {
       case 'flashcards': return <FlashcardsPage userId={userId} />;
       case 'anotacoes': return <AnotacoesPage userId={userId} />;
       case 'progresso': return <ProgressoPage userId={userId} />;
-      case 'motivacional': return <MotivacionalPage userId={userId} />;
       default: return <Dashboard userId={userId} userName={userName} navigateTo={navigateTo} />;
     }
   };

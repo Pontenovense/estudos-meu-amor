@@ -57,26 +57,14 @@ export function useMotivacional(userId: string | undefined) {
       return { id: '0', user_id: null, texto: defaultFrases[0].texto, autor: defaultFrases[0].autor, personalizada: false };
     }
     const today = new Date();
-    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    const effectiveDate = new Date(today);
+    if (today.getHours() < 12) {
+      effectiveDate.setDate(effectiveDate.getDate() - 1);
+    }
+    const seed = effectiveDate.getFullYear() * 10000 + (effectiveDate.getMonth() + 1) * 100 + effectiveDate.getDate();
     const index = seed % frases.length;
     return frases[index];
   }, [frases]);
 
-  const create = useCallback(async (texto: string, autor: string) => {
-    if (!userId) return;
-    await supabase.from('frases_motivacionais').insert({
-      user_id: userId, texto, autor, personalizada: true,
-    });
-    await fetchAll();
-  }, [userId, fetchAll]);
-
-  const remove = useCallback(async (id: string) => {
-    await supabase.from('frases_motivacionais').delete().eq('id', id);
-    await fetchAll();
-  }, [fetchAll]);
-
-  const customPhrases = frases.filter(f => f.personalizada && f.user_id === userId);
-  const defaultPhrasesList = frases.filter(f => !f.personalizada);
-
-  return { frases, loading, getDailyPhrase, create, remove, customPhrases, defaultPhrases: defaultPhrasesList, refresh: fetchAll };
+  return { frases, loading, getDailyPhrase, refresh: fetchAll };
 }
