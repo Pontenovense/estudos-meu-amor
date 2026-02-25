@@ -19,8 +19,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg}']
       },
       manifest: {
-        name: 'StudyFlow',
-        short_name: 'StudyFlow',
+        name: 'Estudos Meu Amor',
+        short_name: 'Estudos Meu Amor',
         description: 'Sua plataforma de estudos completa',
         theme_color: '#a78bfa',
         background_color: '#faf5ff',

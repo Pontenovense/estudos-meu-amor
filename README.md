@@ -1,4 +1,4 @@
-# 📚 StudyFlow – Plataforma de Estudos
+# 📚 Estudos Meu Amor – Plataforma de Estudos
 
 Aplicação completa de organização e produtividade para estudantes, com interface em **Português Brasileiro (pt-BR)**.
 
@@ -29,7 +29,7 @@ Aplicação completa de organização e produtividade para estudantes, com inter
 
 ```bash
 git clone <repo-url>
-cd studyflow
+cd Estudos Meu Amor
 npm install
 ```
 

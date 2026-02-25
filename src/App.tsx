@@ -39,7 +39,7 @@ export function App() {
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-3">Configuração Necessária</h1>
           <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-            Para usar o StudyFlow, configure as variáveis de ambiente do Supabase.
+            Para usar o Estudos Meu Amor, configure as variáveis de ambiente do Supabase.
           </p>
           <div className="bg-gray-900 rounded-xl p-4 text-left text-sm font-mono mb-6 overflow-x-auto">
             <p className="text-green-400"># Crie um arquivo .env na raiz do projeto:</p>
@@ -112,7 +112,7 @@ export function App() {
               <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
             </svg>
           </button>
-          <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">StudyFlow</h1>
+          <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Estudos Meu Amor</h1>
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm font-bold">
             {userName.charAt(0).toUpperCase()}
           </div>
