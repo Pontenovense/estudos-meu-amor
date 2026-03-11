@@ -1,5 +1,5 @@
 // Supabase Edge Function para geração de flashcards com IA
-// Versão com melhor parsing de JSON
+// Versão com logs detalhados
 
 // Modelo correto conforme documentação do Google Gemini API
 const DEFAULT_MODEL = 'gemini-1.5-flash';
@@ -36,13 +36,13 @@ Regras:
 4. Retorne APENAS JSON válido, sem texto antes ou depois.
 
 Formato:
-{"flashcards":[{"pergunta":"...","alternativas":["A","B"],"resposta_correta":"A"},...]}
-
-Gere os flashcards agora.`;
+{"flashcards":[{"pergunta":"...","alternativas":["A","B"],"resposta_correta":"A"},...]}`
 
 // Parser JSON mais robusto
 function parseAIResponse(text: string): any {
-  console.log('Texto recebido (primeiros 500 chars):', text.substring(0, 500));
+  console.log('--- RESPOSTA DA IA ---');
+  console.log('Texto recebido (completo):', text);
+  console.log('----------------------');
   
   // Tentar encontrar JSON de várias formas
   let jsonStr = '';
@@ -68,9 +68,7 @@ function parseAIResponse(text: string): any {
     return JSON.parse(jsonStr);
   } catch (e) {
     console.log('Erro ao fazer parse:', e);
-    // Tentar limpar o JSON
     try {
-      // Remover caracteres inválidos
       const cleaned = jsonStr.replace(/[\x00-\x1F\x7F]/g, '').trim();
       return JSON.parse(cleaned);
     } catch (e2) {
@@ -81,7 +79,9 @@ function parseAIResponse(text: string): any {
 }
 
 Deno.serve(async (req) => {
-  console.log('=== INÍCIO DA FUNÇÃO ===');
+  console.log('===========================================');
+  console.log('NOVA REQUISIÇÃO - GERAÇÃO DE FLASHCARDS');
+  console.log('===========================================');
   
   if (req.method === 'OPTIONS') {
     return corsResponse({ ok: true });
@@ -91,7 +91,14 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { materia, materia_id, topico_especifico, texto_base, user_id } = body;
 
-    console.log('Dados:', { materia, materia_id, user_id });
+    // Log dos dados recebidos do frontend
+    console.log('--- DADOS RECEBIDOS DO FRONTEND ---');
+    console.log('MATERIA:', materia);
+    console.log('MATERIA_ID:', materia_id);
+    console.log('TOPICO_ESPECIFICO:', topico_especifico);
+    console.log('TEXTO_BASE:', texto_base ? texto_base.substring(0, 200) + '...' : '(vazio)');
+    console.log('USER_ID:', user_id);
+    console.log('-----------------------------------');
 
     if (!materia || !materia_id || !user_id) {
       return corsResponse({ error: 'Parâmetros faltando' }, 400);
@@ -102,20 +109,32 @@ Deno.serve(async (req) => {
     }
 
     const apiKey = Deno.env.get('GOOGLE_GEMINI_API_KEY');
+    console.log('API Key configurada:', apiKey ? 'SIM' : 'NÃO');
+    
     if (!apiKey) {
       return corsResponse({ error: 'API key não configurada' }, 500);
     }
 
     const model = getModel();
-    console.log('Modelo:', model);
+    console.log('Modelo Gemini:', model);
 
-    const prompt = SYSTEM_PROMPT
-      .replace('{{MATERIA}}', materia)
-      .replace('{{TOPICO_ESPECIFICO}}', topico_especifico || '')
-      .replace('{{TEXTO_BASE}}', texto_base || '');
+    // Construir o prompt completo com as variáveis
+    const prompt = `${SYSTEM_PROMPT}
+
+Variáveis de entrada:
+- MATERIA: ${materia}
+- TOPICO_ESPECIFICO: ${topico_especifico || '(não especificado)'}
+- TEXTO_BASE: ${texto_base || '(vazio)'}
+
+Gere os flashcards agora.`;
+
+    // Log do prompt completo enviado ao Gemini
+    console.log('--- PROMPT ENVIADO AO GEMINI ---');
+    console.log(prompt);
+    console.log('--------------------------------');
 
     const geminiUrl = `${GEMINI_API_URL_BASE}/${model}:generateContent?key=${apiKey}`;
-    console.log('Chamando Gemini...');
+    console.log('Chamando Gemini API...');
 
     const geminiResponse = await fetch(geminiUrl, {
       method: 'POST',
@@ -125,44 +144,43 @@ Deno.serve(async (req) => {
         generationConfig: { 
           temperature: 0.7, 
           maxOutputTokens: 4096,
-          responseMimeType: 'application/json'  // Forçar resposta JSON
+          responseMimeType: 'application/json'
         },
       }),
     });
 
-    console.log('Status Gemini:', geminiResponse.status);
+    console.log('Status da resposta Gemini:', geminiResponse.status);
 
     if (!geminiResponse.ok) {
       const err = await geminiResponse.text();
-      console.error('Erro Gemini:', err);
+      console.error('Erro da API Gemini:', err);
       return corsResponse({ error: 'Erro na API do Gemini', details: err }, 500);
     }
 
     const geminiData = await geminiResponse.json();
     const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    console.log('Texto recebido, tamanho:', text.length);
+    console.log('Tamanho da resposta:', text.length, 'caracteres');
 
     if (!text) {
       return corsResponse({ error: 'Resposta vazia da IA' }, 500);
     }
 
-    // Usar parser mais robusto
+    // Usar parser mais robusto (já faz log da resposta)
     const jsonData = parseAIResponse(text);
     
     if (!jsonData) {
-      return corsResponse({ error: 'Não foi possível parsear a resposta da IA', text_preview: text.substring(0, 200) }, 500);
+      return corsResponse({ error: 'Não foi possível parsear a resposta da IA' }, 500);
     }
 
     let flashcards = jsonData.flashcards;
     
-    // Se a resposta for um array direto (sem objeto outer)
     if (!flashcards && Array.isArray(jsonData)) {
       flashcards = jsonData;
     }
 
     if (!flashcards || !Array.isArray(flashcards)) {
-      return corsResponse({ error: 'Formato inválido - não contém flashcards', keys: Object.keys(jsonData) }, 500);
+      return corsResponse({ error: 'Formato inválido - não contém flashcards' }, 500);
     }
 
     if (flashcards.length !== 10) {
@@ -173,7 +191,7 @@ Deno.serve(async (req) => {
     for (let i = 0; i < flashcards.length; i++) {
       const card = flashcards[i];
       if (!card.pergunta || !card.alternativas || !card.resposta_correta) {
-        return corsResponse({ error: `Flashcard ${i+1} incompleto`, card }, 500);
+        return corsResponse({ error: `Flashcard ${i+1} incompleto` }, 500);
       }
       if (!Array.isArray(card.alternativas) || card.alternativas.length < 2 || card.alternativas.length > 3) {
         return corsResponse({ error: `Flashcard ${i+1} com alternativas inválidas` }, 500);
@@ -183,7 +201,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log('Flashcards validados com sucesso!');
+    console.log('--- FLASHCARDS GERADOS ---');
+    console.log('Quantidade:', flashcards.length);
+    flashcards.forEach((card: any, i: number) => {
+      console.log(`Card ${i+1}:`, {
+        pergunta: card.pergunta.substring(0, 50) + '...',
+        alternativas: card.alternativas,
+        resposta_correta: card.resposta_correta
+      });
+    });
+    console.log('--------------------------');
 
     // Salvar no banco
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -203,7 +230,7 @@ Deno.serve(async (req) => {
       erros: 0,
     }));
 
-    console.log('Salvando no banco...');
+    console.log('Salvando no banco de dados...');
     const insertRes = await fetch(`${supabaseUrl}/rest/v1/flashcards`, {
       method: 'POST',
       headers: {
@@ -221,12 +248,15 @@ Deno.serve(async (req) => {
     }
 
     const insertedData = await insertRes.json();
-    console.log('Sucesso! Flashcards salvos:', insertedData.length);
+    console.log('=== SUCESSO! ===');
+    console.log('Flashcards salvos:', insertedData.length);
+    console.log('===========================================');
 
     return corsResponse({ success: true, count: flashcards.length, model });
 
   } catch (e) {
     console.error('Erro geral:', e);
+    console.log('===========================================');
     return corsResponse({ error: String(e) }, 500);
   }
 });
