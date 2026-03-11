@@ -23,26 +23,54 @@ export function useFlashcards(userId: string | undefined) {
     return flashcards.filter(f => f.materia_id === materiaId);
   }, [flashcards]);
 
+  // Função para criar um flashcard manualmente
   const create = useCallback(async (input: {
-    materia_id: string; pergunta: string; resposta: string;
-    criado_por_ia: boolean; nivel_dificuldade: string;
+    materia_id: string; 
+    pergunta: string; 
+    resposta: string;
+    alternativas?: string[];
+    resposta_correta?: string;
+    criado_por_ia: boolean; 
+    nivel_dificuldade: string;
   }) => {
     if (!userId) return;
     await supabase.from('flashcards').insert({
-      user_id: userId, ...input,
-      vezes_revisado: 0, acertos: 0, erros: 0,
+      user_id: userId, 
+      pergunta: input.pergunta,
+      resposta: input.resposta,
+      alternativas: input.alternativas || [],
+      resposta_correta: input.resposta_correta || input.resposta,
+      criado_por_ia: input.criado_por_ia,
+      nivel_dificuldade: input.nivel_dificuldade,
+      vezes_revisado: 0, 
+      acertos: 0, 
+      erros: 0,
     });
     await fetchAll();
   }, [userId, fetchAll]);
 
+  // Função para criar múltiplos flashcards (usado pela IA)
   const createMany = useCallback(async (items: {
-    materia_id: string; pergunta: string; resposta: string;
-    criado_por_ia: boolean; nivel_dificuldade: string;
+    materia_id: string; 
+    pergunta: string; 
+    resposta: string;
+    alternativas?: string[];
+    resposta_correta?: string;
+    criado_por_ia: boolean; 
+    nivel_dificuldade: string;
   }[]) => {
     if (!userId) return;
     const rows = items.map(item => ({
-      user_id: userId, ...item,
-      vezes_revisado: 0, acertos: 0, erros: 0,
+      user_id: userId, 
+      pergunta: item.pergunta,
+      resposta: item.resposta,
+      alternativas: item.alternativas || [],
+      resposta_correta: item.resposta_correta || item.resposta,
+      criado_por_ia: item.criado_por_ia,
+      nivel_dificuldade: item.nivel_dificuldade,
+      vezes_revisado: 0, 
+      acertos: 0, 
+      erros: 0,
     }));
     await supabase.from('flashcards').insert(rows);
     await fetchAll();

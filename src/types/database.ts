@@ -58,6 +58,8 @@ export interface Database {
           materia_id: string;
           pergunta: string;
           resposta: string;
+          alternativas: string[];
+          resposta_correta: string;
           criado_por_ia: boolean;
           data_criacao: string;
           nivel_dificuldade: string;
@@ -71,6 +73,8 @@ export interface Database {
           materia_id: string;
           pergunta: string;
           resposta: string;
+          alternativas?: string[];
+          resposta_correta?: string;
           criado_por_ia?: boolean;
           data_criacao?: string;
           nivel_dificuldade?: string;
@@ -81,6 +85,8 @@ export interface Database {
         Update: {
           pergunta?: string;
           resposta?: string;
+          alternativas?: string[];
+          resposta_correta?: string;
           nivel_dificuldade?: string;
           vezes_revisado?: number;
           acertos?: number;
